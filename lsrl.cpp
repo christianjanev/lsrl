@@ -1,59 +1,70 @@
+#include "stats.h"
+#include <assert.h>
+#include <fstream>
 #include <iostream>
+#include <stdexcept>
+#include <string>
+#include <utility>
 #include <vector>
+
+typedef std::pair<std::vector<float>, std::vector<float>> list_pair;
+typedef std::pair<std::string, std::string> list_title_pair;
+
+std::pair<list_pair, list_title_pair> read_data(std::string path)
+{
+    /* first = titles (x, y), second = data (x, y) */
+    std::ifstream data;
+    data.open(path);
+    assert(data.is_open());
+
+    std::string line;
+
+    std::vector<float> x;
+    std::vector<float> y;
+    std::string x_title;
+    std::string y_title;
+
+    std::getline(data, line);
+    try {
+        std::stof(line);
+        data.clear();
+        data.seekg(0);
+        y_title = "y";
+        x_title = "x";
+    } catch (const std::invalid_argument& err) { // titles are in the first line.
+        x_title = line.substr(0, line.find(","));
+        y_title = line.substr(line.find(",") + 1, line.length());
+    }
+
+    while (std::getline(data, line))
+    {
+        x.push_back(std::stof(line.substr(0, line.find(","))));
+        y.push_back(std::stof(line.substr(line.find(",") + 1, line.length())));
+    }
+
+    data.close();
+
+    list_pair pair_of_lists = std::make_pair(x, y);
+    list_title_pair pair_of_titles = std::make_pair(x_title, y_title);
+
+
+    return std::make_pair(pair_of_lists, pair_of_titles);
+}
 
 int main(int argc, char** argv)
 {
     std::vector<float> x;
     std::vector<float> y;
 
-    x.push_back(1);
-    x.push_back(2);
-    x.push_back(3);
-    x.push_back(4);
-    x.push_back(5);
-    x.push_back(6);
-    x.push_back(7);
+    auto data = read_data("data.csv");
+    x = data.first.first;
+    y = data.first.second;
 
-    y.push_back(1);
-    y.push_back(4);
-    y.push_back(9);
-    y.push_back(16);
-    y.push_back(25);
-    y.push_back(36);
-    y.push_back(49);
+    std::optional<linear_equation> lsrl = linreg(x, y);
 
-    if (x.size() != y.size())
-    {
-        std::cerr << "X data must be the same size as Y data\n";
-        exit(1);
-    }
-
-    float x_sum = 0;
-    float y_sum = 0;
-
-    for (int i = 0; i < x.size(); i++)
-    {
-        x_sum += x[i];
-        y_sum += y[i];
-    }
-
-    float x_mean = x_sum / x.size();
-    float y_mean = y_sum / y.size();
-
-    float numerator = 0;
-    float denominator = 0;
-
-    for (int i = 0; i < x.size(); i++)
-    {
-        numerator += (x[i] - x_mean) * (y[i] - y_mean);
-        denominator += ( (x[i] - x_mean) * (x[i] - x_mean) );
-    }
-
-    float b = numerator / denominator;
-    
-    float a = (y_sum - b * x_sum) / x.size();
-
-    std::cout << "The LSRL equation is y = " << a << " + " << b << "x" "\n";
+    if (lsrl.has_value())
+        std::cout << "The LSRL equation is " << data.second.second << " = " << lsrl->a << " + " << lsrl->b << "(" << data.second.first << ")\n";
+    else { std::cerr << "X and Y must be the same size.\n"; exit(1); }
 
     return 1;
 }
