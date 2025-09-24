@@ -1,6 +1,5 @@
 #include "stats.h"
 #include <cmath>
-#include <iostream>
 #include <optional>
 
 std::optional<linear_equation> linreg(std::vector<float> x, std::vector<float> y)
@@ -32,7 +31,7 @@ std::optional<linear_equation> linreg(std::vector<float> x, std::vector<float> y
 
     lsrl.b = numerator / denominator;
     
-    lsrl.a = (y_sum - lsrl.b * x_sum) / x.size();
+    lsrl.a = (y_mean - lsrl.b * x_mean);
 
     return lsrl;
 }
