@@ -11,5 +11,6 @@ struct linear_equation
 };
 
 std::optional<linear_equation> linreg(std::vector<float> x, std::vector<float> y);
+std::optional<float> r(std::vector<float> x, std::vector<float> y);
 
 #endif

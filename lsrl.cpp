@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -26,7 +27,7 @@ std::pair<list_pair, list_title_pair> read_data(std::string path)
 
     std::getline(data, line);
     try {
-        std::stof(line);
+        std::stof(line.substr(0, line.find(","))); // are we able to turn the first half of line 1 into a float?
         data.clear();
         data.seekg(0);
         y_title = "y";
@@ -47,7 +48,6 @@ std::pair<list_pair, list_title_pair> read_data(std::string path)
     list_pair pair_of_lists = std::make_pair(x, y);
     list_title_pair pair_of_titles = std::make_pair(x_title, y_title);
 
-
     return std::make_pair(pair_of_lists, pair_of_titles);
 }
 
@@ -61,9 +61,10 @@ int main(int argc, char** argv)
     y = data.first.second;
 
     std::optional<linear_equation> lsrl = linreg(x, y);
+    std::optional<float> correlation_coefficient = r(x,y);
 
     if (lsrl.has_value())
-        std::cout << "The LSRL equation is " << data.second.second << " = " << lsrl->a << " + " << lsrl->b << "(" << data.second.first << ")\n";
+        std::cout << "The LSRL equation is " << data.second.second << " = " << lsrl->a << " + " << lsrl->b << "(" << data.second.first << ") with an r=" << correlation_coefficient.value() << "\n";
     else { std::cerr << "X and Y must be the same size.\n"; exit(1); }
 
     return 1;
