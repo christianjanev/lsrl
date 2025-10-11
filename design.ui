@@ -112,6 +112,11 @@
          </row>
          <row>
           <property name="text">
+           <string>Σx</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
            <string>Σx²</string>
           </property>
          </row>

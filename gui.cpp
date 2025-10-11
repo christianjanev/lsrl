@@ -1,8 +1,6 @@
 #include "gui.h"
-#include "qcolor.h"
 #include "stats.h"
 #include "data.h"
-#include <iostream>
 
 Window::Window(QWidget* parent) : QMainWindow(parent)
 {
@@ -20,17 +18,15 @@ Window::Window(QWidget* parent) : QMainWindow(parent)
     x = data_tables.first;
     y = data_tables.second;
 
-    QStringList titles;
-    titles.append(QString::fromStdString(data.second.first));
-    titles.append(QString::fromStdString(data.second.second));
-    table->setHorizontalHeaderLabels(titles);
+    QStringList table_titles;
+    table_titles.append(QString::fromStdString(data.second.first));
+    table_titles.append(QString::fromStdString(data.second.second));
+    table->setHorizontalHeaderLabels(table_titles);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     table->setRowCount(x.size());
 
-
     series = new QScatterSeries;
     line = new QScatterSeries;
-
 
     for (int i = 0; i < x.size(); i++)
     {
@@ -48,7 +44,7 @@ Window::Window(QWidget* parent) : QMainWindow(parent)
         line->append(x[i], y[i]);
     }
 
-    series->setMarkerSize(10);
+    series->setMarkerSize(15);
     series->setBestFitLineVisible(false);
     series->setSelectedColor(QColorConstants::Red);
 
@@ -63,10 +59,49 @@ Window::Window(QWidget* parent) : QMainWindow(parent)
     graph->addSeries(series);
     graph->addSeries(line);
     graph->createDefaultAxes();
+    QList<QAbstractAxis*> axes = graph->axes(Qt::Horizontal|Qt::Vertical, series);
+    QValueAxis* x_axis = (QValueAxis*) axes.first();
+    QValueAxis* y_axis = (QValueAxis*) axes.last();
+    x_axis->setMax(x_axis->max() * 1.2);
+    y_axis->setMax(y_axis->max() * 1.2);
+
     graph->legend()->hide();
     graph->setDropShadowEnabled(false);
+    graph->setTitle(QString::fromStdString(titles.first + " vs " + titles.second));
+
+    stats = ui->stats;
+
+    r_item = new QTableWidgetItem;
+    r2_item = new QTableWidgetItem;
+
+    x_mean_item = new QTableWidgetItem;
+    sum_x_item = new QTableWidgetItem;
+    sum_x2_item = new QTableWidgetItem;
+    min_x_item = new QTableWidgetItem;
+    max_x_item = new QTableWidgetItem;
+
+    sum_y_item = new QTableWidgetItem;
+    sum_y2_item = new QTableWidgetItem;
+    min_y_item = new QTableWidgetItem;
+    max_y_item = new QTableWidgetItem;
+
+    update_stats();
+
+    stats->setItem(0, 0, r_item);
+    stats->setItem(1, 0, r2_item);
+    stats->setItem(2, 0, x_mean_item);
+    stats->setItem(3, 0, sum_x_item);
+    stats->setItem(4, 0, sum_x2_item);
+    stats->setItem(6, 0, min_x_item);
+    stats->setItem(7, 0, max_x_item);
+
+    stats->setItem(9, 0, sum_y_item);
+    stats->setItem(10, 0, sum_y2_item);
+    stats->setItem(12, 0, min_y_item);
+    stats->setItem(13, 0, max_y_item);
 
     connect(table, &QTableWidget::cellChanged, this, &Window::table_updated);
+    connect(table, &QTableWidget::currentCellChanged, this, &Window::cell_selected);
 }
 
 Window::~Window()
@@ -83,20 +118,99 @@ void Window::table_updated(int row, int col)
         data_tables.first[row] = std::stof(table->item(row, col)->text().toStdString());
     else
         data_tables.second[row] = std::stof(table->item(row, col)->text().toStdString());
+
+    update_stats();
+}
+
+void Window::cell_selected(int row, int col, int old_row, int old_col)
+{
+    series->setPointSelected(old_row, false);
+    series->setPointSelected(row, true);
 }
 
 void Window::button_pressed()
 {
-    std::optional<linear_equation> lsrl = linreg(data_tables.first, data_tables.second);
-    std::optional<float> correlation_coefficient = r(data_tables.first, data_tables.second);
+    // std::optional<linear_equation> lsrl = linreg(data_tables.first, data_tables.second);
+    // std::optional<float> correlation_coefficient = r(data_tables.first, data_tables.second);
 
-    if (lsrl.has_value())
-        equation_string = titles.second + " = " + std::to_string(lsrl.value().a) + " + " + std::to_string(lsrl->b) + "(" + titles.first + ")";
-    else { std::cerr << "X and Y must be the same size.\n"; exit(1); }
+    // if (lsrl.has_value())
+    //     equation_string = titles.second + " = " + std::to_string(lsrl.value().a) + " + " + std::to_string(lsrl->b) + "(" + titles.first + ")";
+    // else { std::cerr << "X and Y must be the same size.\n"; exit(1); }
     
-    if (correlation_coefficient.has_value())
-        r_string = "r=" + std::to_string(correlation_coefficient.value());
-    else { std::cerr << "X and Y must be the same size.\n"; exit(1); }
-    equation->setText(QString::fromStdString(equation_string));
-    correlation->setText(QString::fromStdString(r_string));
+    // if (correlation_coefficient.has_value())
+    //     r_string = "r=" + std::to_string(correlation_coefficient.value());
+    // else { std::cerr << "X and Y must be the same size.\n"; exit(1); }
+    // equation->setText(QString::fromStdString(equation_string));
+    // correlation->setText(QString::fromStdString(r_string));
+}
+
+void Window::update_stats()
+{
+    std::optional<float> r_value = r(data_tables.first, data_tables.second);
+    std::optional<sums> sum_pair = sum_of_two(data_tables.first, data_tables.second);
+    std::optional<sums> sum2_pair = sum_of_two_squared(data_tables.first, data_tables.second);
+    std::optional<float> x_min = min(data_tables.first);
+    std::optional<float> x_max = max(data_tables.first);
+    std::optional<float> y_min = min(data_tables.second);
+    std::optional<float> y_max = max(data_tables.second);
+
+    r_string = "Failed to calculate r";
+    r2_string = "Failed to calculated r^2";
+
+    x_mean_string = "Failed to calculate mean of x";
+    sum_x_string = "Failed to calculate sum of x";
+    sum_x2_string = "Failed to calculate sum of x^2";
+    min_x_string = "Failed to calculate min of x";
+    max_x_string = "Failed to calculate max of x";
+
+    sum_y_string = "Failed to calculate sum of y";
+    sum_y2_string = "Failed to calculate sum of y^2";
+    min_y_string = "Failed to calculate min of y";
+    max_y_string = "Failed to calculate max of y";
+
+    if (r_value.has_value())
+    {
+        r_string = std::to_string(r_value.value());
+        r2_string = std::to_string(r_value.value() * r_value.value());
+    }
+
+    if (sum_pair.has_value())
+    {
+        sum_x_string = std::to_string(sum_pair.value().first);
+        sum_y_string = std::to_string(sum_pair.value().second);
+
+        x_mean_string = std::to_string(sum_pair.value().first / data_tables.first.size());
+    }
+
+    if (sum2_pair.has_value())
+    {
+        sum_x2_string = std::to_string(sum2_pair.value().first);
+        sum_y2_string = std::to_string(sum2_pair.value().second);
+    }
+
+    if (x_min.has_value())
+    {
+        min_x_string = std::to_string(x_min.value());
+        max_x_string = std::to_string(x_max.value());
+    }
+
+    if (y_min.has_value())
+    {
+        min_y_string = std::to_string(y_min.value());
+        max_y_string = std::to_string(y_max.value());
+    }
+
+    r_item->setText(QString::fromStdString(r_string));
+    r2_item->setText(QString::fromStdString(r2_string));
+
+    x_mean_item->setText(QString::fromStdString(x_mean_string));
+    sum_x_item->setText(QString::fromStdString(sum_x_string));
+    sum_x2_item->setText(QString::fromStdString(sum_x2_string));
+    min_x_item->setText(QString::fromStdString(min_x_string));
+    max_x_item->setText(QString::fromStdString(max_x_string));
+
+    sum_y_item->setText(QString::fromStdString(sum_y_string));
+    sum_y2_item->setText(QString::fromStdString(sum_y2_string));
+    min_y_item->setText(QString::fromStdString(min_y_string));
+    max_y_item->setText(QString::fromStdString(max_y_string));
 }

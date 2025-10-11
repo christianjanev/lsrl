@@ -95,8 +95,8 @@ public:
             stats->setColumnCount(1);
         QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
         stats->setHorizontalHeaderItem(0, __qtablewidgetitem);
-        if (stats->rowCount() < 15)
-            stats->setRowCount(15);
+        if (stats->rowCount() < 16)
+            stats->setRowCount(16);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
         stats->setVerticalHeaderItem(0, __qtablewidgetitem1);
         QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
@@ -127,6 +127,8 @@ public:
         stats->setVerticalHeaderItem(13, __qtablewidgetitem14);
         QTableWidgetItem *__qtablewidgetitem15 = new QTableWidgetItem();
         stats->setVerticalHeaderItem(14, __qtablewidgetitem15);
+        QTableWidgetItem *__qtablewidgetitem16 = new QTableWidgetItem();
+        stats->setVerticalHeaderItem(15, __qtablewidgetitem16);
         stats->setObjectName("stats");
         stats->horizontalHeader()->setStretchLastSection(true);
 
@@ -176,29 +178,31 @@ public:
         QTableWidgetItem *___qtablewidgetitem3 = stats->verticalHeaderItem(2);
         ___qtablewidgetitem3->setText(QCoreApplication::translate("LSRL_Design", "x\314\204", nullptr));
         QTableWidgetItem *___qtablewidgetitem4 = stats->verticalHeaderItem(3);
-        ___qtablewidgetitem4->setText(QCoreApplication::translate("LSRL_Design", "\316\243x\302\262", nullptr));
+        ___qtablewidgetitem4->setText(QCoreApplication::translate("LSRL_Design", "\316\243x", nullptr));
         QTableWidgetItem *___qtablewidgetitem5 = stats->verticalHeaderItem(4);
-        ___qtablewidgetitem5->setText(QCoreApplication::translate("LSRL_Design", "S\342\202\223", nullptr));
+        ___qtablewidgetitem5->setText(QCoreApplication::translate("LSRL_Design", "\316\243x\302\262", nullptr));
         QTableWidgetItem *___qtablewidgetitem6 = stats->verticalHeaderItem(5);
-        ___qtablewidgetitem6->setText(QCoreApplication::translate("LSRL_Design", "minX", nullptr));
+        ___qtablewidgetitem6->setText(QCoreApplication::translate("LSRL_Design", "S\342\202\223", nullptr));
         QTableWidgetItem *___qtablewidgetitem7 = stats->verticalHeaderItem(6);
-        ___qtablewidgetitem7->setText(QCoreApplication::translate("LSRL_Design", "maxX", nullptr));
+        ___qtablewidgetitem7->setText(QCoreApplication::translate("LSRL_Design", "minX", nullptr));
         QTableWidgetItem *___qtablewidgetitem8 = stats->verticalHeaderItem(7);
-        ___qtablewidgetitem8->setText(QCoreApplication::translate("LSRL_Design", "y\314\204", nullptr));
+        ___qtablewidgetitem8->setText(QCoreApplication::translate("LSRL_Design", "maxX", nullptr));
         QTableWidgetItem *___qtablewidgetitem9 = stats->verticalHeaderItem(8);
-        ___qtablewidgetitem9->setText(QCoreApplication::translate("LSRL_Design", "\316\243y", nullptr));
+        ___qtablewidgetitem9->setText(QCoreApplication::translate("LSRL_Design", "y\314\204", nullptr));
         QTableWidgetItem *___qtablewidgetitem10 = stats->verticalHeaderItem(9);
-        ___qtablewidgetitem10->setText(QCoreApplication::translate("LSRL_Design", "\316\243y\302\262", nullptr));
+        ___qtablewidgetitem10->setText(QCoreApplication::translate("LSRL_Design", "\316\243y", nullptr));
         QTableWidgetItem *___qtablewidgetitem11 = stats->verticalHeaderItem(10);
-        ___qtablewidgetitem11->setText(QCoreApplication::translate("LSRL_Design", "S\341\265\247", nullptr));
+        ___qtablewidgetitem11->setText(QCoreApplication::translate("LSRL_Design", "\316\243y\302\262", nullptr));
         QTableWidgetItem *___qtablewidgetitem12 = stats->verticalHeaderItem(11);
-        ___qtablewidgetitem12->setText(QCoreApplication::translate("LSRL_Design", "minY", nullptr));
+        ___qtablewidgetitem12->setText(QCoreApplication::translate("LSRL_Design", "S\341\265\247", nullptr));
         QTableWidgetItem *___qtablewidgetitem13 = stats->verticalHeaderItem(12);
-        ___qtablewidgetitem13->setText(QCoreApplication::translate("LSRL_Design", "maxY", nullptr));
+        ___qtablewidgetitem13->setText(QCoreApplication::translate("LSRL_Design", "minY", nullptr));
         QTableWidgetItem *___qtablewidgetitem14 = stats->verticalHeaderItem(13);
-        ___qtablewidgetitem14->setText(QCoreApplication::translate("LSRL_Design", "\316\243xy", nullptr));
+        ___qtablewidgetitem14->setText(QCoreApplication::translate("LSRL_Design", "maxY", nullptr));
         QTableWidgetItem *___qtablewidgetitem15 = stats->verticalHeaderItem(14);
-        ___qtablewidgetitem15->setText(QCoreApplication::translate("LSRL_Design", "n", nullptr));
+        ___qtablewidgetitem15->setText(QCoreApplication::translate("LSRL_Design", "\316\243xy", nullptr));
+        QTableWidgetItem *___qtablewidgetitem16 = stats->verticalHeaderItem(15);
+        ___qtablewidgetitem16->setText(QCoreApplication::translate("LSRL_Design", "n", nullptr));
         menuFile->setTitle(QCoreApplication::translate("LSRL_Design", "File", nullptr));
     } // retranslateUi
 

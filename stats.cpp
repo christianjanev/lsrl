@@ -1,10 +1,25 @@
 #include "stats.h"
 #include <cmath>
+#include <limits>
 #include <optional>
 
-std::optional<linear_equation> linreg(std::vector<float> x, std::vector<float> y)
+std::optional<float> sum(std::vector<float> x)
 {
-    if (x.size() != y.size()) return std::nullopt;
+    if (x.size() == 0) return std::nullopt;
+
+    float sum = 0;
+
+    for (int i = 0; i < x.size(); i++)
+    {
+        sum += x[i];
+    }
+
+    return sum;
+}
+
+std::optional<sums> sum_of_two(std::vector<float> x, std::vector<float> y)
+{
+    if (x.size() == 0 || x.size() != y.size()) return std::nullopt;
 
     float x_sum = 0;
     float y_sum = 0;
@@ -15,8 +30,86 @@ std::optional<linear_equation> linreg(std::vector<float> x, std::vector<float> y
         y_sum += y[i];
     }
 
-    float x_mean = x_sum / x.size();
-    float y_mean = y_sum / y.size();
+    sums pair;
+    pair.first = x_sum;
+    pair.second = y_sum;
+
+    return pair;
+}
+
+std::optional<float> sum_squard(std::vector<float> x)
+{
+    if (x.size() == 0) return std::nullopt;
+
+    float sum = 0;
+
+    for (int i = 0; i < x.size(); i++)
+    {
+        sum += x[i] * x[i];
+    }
+
+    return sum;
+}
+
+std::optional<sums> sum_of_two_squared(std::vector<float> x, std::vector<float> y)
+{
+    if (x.size() == 0 || x.size() != y.size()) return std::nullopt;
+
+    float x_sum = 0;
+    float y_sum = 0;
+
+    for (int i = 0; i < x.size(); i++)
+    {
+        x_sum += x[i] * x[i];
+        y_sum += y[i] * y[i];
+    }
+
+    sums pair;
+    pair.first = x_sum;
+    pair.second = y_sum;
+
+    return pair;
+}
+
+std::optional<float> max(std::vector<float> x)
+{
+    if (x.size() == 0) return std::nullopt;
+
+    float max = std::numeric_limits<float>::min();
+
+    for (int i = 0; i < x.size(); i++)
+    {
+        if (x[i] > max) max = x[i];
+    }
+
+    return max;
+}
+
+std::optional<float> min(std::vector<float> x)
+{
+    if (x.size() == 0) return std::nullopt;
+
+    float min = std::numeric_limits<float>::max();
+
+    for (int i = 0; i < x.size(); i++)
+    {
+        if (x[i] < min) min = x[i];
+    }
+
+    return min;
+}
+
+std::optional<linear_equation> linreg(std::vector<float> x, std::vector<float> y)
+{
+    std::optional<sums> pair_sums = sum_of_two(x, y);
+
+    if (x.size() != y.size() || !pair_sums.has_value()) return std::nullopt;
+
+    float x_mean = pair_sums->first;
+    float y_mean = pair_sums->second;
+
+    x_mean /= x.size();
+    y_mean /= y.size();
 
     float numerator = 0;
     float denominator = 0;
@@ -38,16 +131,12 @@ std::optional<linear_equation> linreg(std::vector<float> x, std::vector<float> y
 
 std::optional<float> r(std::vector<float> x, std::vector<float> y)
 {
-    if (x.size() != y.size()) return std::nullopt;
+    std::optional<sums> pair_sums = sum_of_two(x, y);
 
-    float x_mean = 0;
-    float y_mean = 0;
+    if (x.size() != y.size() || !pair_sums.has_value()) return std::nullopt;
 
-    for (int i = 0; i < x.size(); i++)
-    {
-        x_mean += x[i];
-        y_mean += y[i];
-    }
+    float x_mean = pair_sums->first;
+    float y_mean = pair_sums->second;
 
     x_mean /= x.size();
     y_mean /= y.size();

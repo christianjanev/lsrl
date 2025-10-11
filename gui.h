@@ -18,6 +18,7 @@
 #include <QtCharts/QScatterSeries>
 #include <QtCharts/QChart>
 #include <QPen>
+#include <QtCharts/QValueAxis>
 
 #include <string>
 #include <iostream>
@@ -29,19 +30,45 @@ class Window : public QMainWindow
         virtual ~Window();
         Ui_LSRL_Design* ui;
     private:
-        QLabel* equation;
-        QLabel* correlation;
         QTableWidget* table;
+        QTableWidget* stats;
+
+        QTableWidgetItem* r_item;
+        QTableWidgetItem* r2_item;
+        QTableWidgetItem* x_mean_item;
+        QTableWidgetItem* sum_x_item;
+        QTableWidgetItem* sum_y_item;
+        QTableWidgetItem* sum_x2_item;
+        QTableWidgetItem* sum_y2_item;
+        QTableWidgetItem* min_x_item;
+        QTableWidgetItem* max_x_item;
+        QTableWidgetItem* min_y_item;
+        QTableWidgetItem* max_y_item;
+
         std::string equation_string;
         std::string r_string;
+        std::string r2_string;
+        std::string x_mean_string;
+        std::string sum_x_string;
+        std::string sum_y_string;
+        std::string sum_x2_string;
+        std::string sum_y2_string;
+        std::string min_x_string;
+        std::string max_x_string;
+        std::string min_y_string;
+        std::string max_y_string;
+
         std::pair<std::vector<float>, std::vector<float>> data_tables;
         std::pair<std::string, std::string> titles;
+
         QScatterSeries* series;
         QScatterSeries* line;
         QChart* graph;
     private slots:
         void button_pressed();
         void table_updated(int row, int col);
+        void cell_selected(int row, int col, int old_row, int old_col);
+        void update_stats();
 };
 
 #endif
