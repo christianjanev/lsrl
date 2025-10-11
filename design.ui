@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LSRL_Design</class>
+ <widget class="QMainWindow" name="LSRL_Design">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1600</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1600</width>
+    <height>900</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>LSRL</string>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::TabShape::Rounded</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>9</y>
+      <width>1582</width>
+      <height>841</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="0" colspan="4">
+      <widget class="QPushButton" name="calculate">
+       <property name="text">
+        <string>Calculate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QTableWidget" name="table">
+         <property name="gridStyle">
+          <enum>Qt::PenStyle::DashLine</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="rowCount">
+          <number>15</number>
+         </property>
+         <property name="columnCount">
+          <number>2</number>
+         </property>
+         <attribute name="horizontalHeaderCascadingSectionResizes">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderStretchLastSection">
+          <bool>false</bool>
+         </attribute>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <row/>
+         <column/>
+         <column/>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="stats">
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <row>
+          <property name="text">
+           <string>r</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>r²</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>x̄</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Σx²</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Sₓ</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>minX</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>maxX</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>ȳ</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Σy</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Σy²</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Sᵧ</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>minY</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>maxY</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>Σxy</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>n</string>
+          </property>
+         </row>
+         <column>
+          <property name="text">
+           <string>Two Variable Statistics</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="2">
+      <widget class="QChartView" name="graph">
+       <property name="minimumSize">
+        <size>
+         <width>1200</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1600</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>QtCharts.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
