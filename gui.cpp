@@ -60,10 +60,12 @@ Window::Window(QWidget* parent) : QMainWindow(parent)
     graph->addSeries(line);
     graph->createDefaultAxes();
     QList<QAbstractAxis*> axes = graph->axes(Qt::Horizontal|Qt::Vertical, series);
-    QValueAxis* x_axis = (QValueAxis*) axes.first();
-    QValueAxis* y_axis = (QValueAxis*) axes.last();
-    x_axis->setMax(x_axis->max() * 1.2);
-    y_axis->setMax(y_axis->max() * 1.2);
+    x_axis = (QValueAxis*) axes.first();
+    y_axis = (QValueAxis*) axes.last();
+    x_axis->setMax(max(x).value() * 1.2);
+    y_axis->setMax(max(y).value() * 1.6);
+    x_axis->setMin(min(x).value() - (min(x).value() * 0.2 + 1));
+    y_axis->setMin(min(y).value() - (min(y).value() * 0.2 + 1));
 
     graph->legend()->hide();
     graph->setDropShadowEnabled(false);
@@ -77,13 +79,20 @@ Window::Window(QWidget* parent) : QMainWindow(parent)
     x_mean_item = new QTableWidgetItem;
     sum_x_item = new QTableWidgetItem;
     sum_x2_item = new QTableWidgetItem;
+    std_dev_x_item = new QTableWidgetItem;
     min_x_item = new QTableWidgetItem;
     max_x_item = new QTableWidgetItem;
 
+    y_mean_item = new QTableWidgetItem;
     sum_y_item = new QTableWidgetItem;
     sum_y2_item = new QTableWidgetItem;
+    std_dev_y_item = new QTableWidgetItem;
     min_y_item = new QTableWidgetItem;
     max_y_item = new QTableWidgetItem;
+
+    sum_multiplied_item = new QTableWidgetItem;
+
+    size_item = new QTableWidgetItem;
 
     update_stats();
 
@@ -92,13 +101,20 @@ Window::Window(QWidget* parent) : QMainWindow(parent)
     stats->setItem(2, 0, x_mean_item);
     stats->setItem(3, 0, sum_x_item);
     stats->setItem(4, 0, sum_x2_item);
+    stats->setItem(5, 0, std_dev_x_item);
     stats->setItem(6, 0, min_x_item);
     stats->setItem(7, 0, max_x_item);
 
+    stats->setItem(8, 0, y_mean_item);
     stats->setItem(9, 0, sum_y_item);
     stats->setItem(10, 0, sum_y2_item);
+    stats->setItem(11, 0, std_dev_y_item);
     stats->setItem(12, 0, min_y_item);
     stats->setItem(13, 0, max_y_item);
+
+    stats->setItem(14, 0, sum_multiplied_item);
+
+    stats->setItem(15, 0, size_item);
 
     connect(table, &QTableWidget::cellChanged, this, &Window::table_updated);
     connect(table, &QTableWidget::currentCellChanged, this, &Window::cell_selected);
@@ -118,6 +134,11 @@ void Window::table_updated(int row, int col)
         data_tables.first[row] = std::stof(table->item(row, col)->text().toStdString());
     else
         data_tables.second[row] = std::stof(table->item(row, col)->text().toStdString());
+
+    x_axis->setMax(max(data_tables.first).value() * 1.2);
+    y_axis->setMax(max(data_tables.second).value() * 1.6);
+    x_axis->setMin(min(data_tables.first).value() - ( (min(data_tables.first).value() * 0.2) + 1 ));
+    y_axis->setMin(min(data_tables.second).value() - ( (min(data_tables.second).value() * 0.2) + 1 ));
 
     update_stats();
 }
@@ -153,6 +174,9 @@ void Window::update_stats()
     std::optional<float> x_max = max(data_tables.first);
     std::optional<float> y_min = min(data_tables.second);
     std::optional<float> y_max = max(data_tables.second);
+    std::optional<float> var_x = variance(data_tables.first);
+    std::optional<float> var_y = variance(data_tables.second);
+    std::optional<float> sum_multiplied;
 
     r_string = "Failed to calculate r";
     r2_string = "Failed to calculated r^2";
@@ -160,13 +184,20 @@ void Window::update_stats()
     x_mean_string = "Failed to calculate mean of x";
     sum_x_string = "Failed to calculate sum of x";
     sum_x2_string = "Failed to calculate sum of x^2";
+    std_dev_x_string = "Failed to calculate variance of x";
     min_x_string = "Failed to calculate min of x";
     max_x_string = "Failed to calculate max of x";
 
+    y_mean_string = "Failed to calculate mean of y";
     sum_y_string = "Failed to calculate sum of y";
     sum_y2_string = "Failed to calculate sum of y^2";
+    std_dev_y_string = "Failed to calculate variance of y";
     min_y_string = "Failed to calculate min of y";
     max_y_string = "Failed to calculate max of y";
+
+    sum_multiplied_string = "Failed to calculate sum of lists multiplied";
+
+    std::string size_string = std::to_string(data_tables.first.size());
 
     if (r_value.has_value())
     {
@@ -180,6 +211,7 @@ void Window::update_stats()
         sum_y_string = std::to_string(sum_pair.value().second);
 
         x_mean_string = std::to_string(sum_pair.value().first / data_tables.first.size());
+        y_mean_string = std::to_string(sum_pair.value().second / data_tables.first.size());
     }
 
     if (sum2_pair.has_value())
@@ -200,17 +232,48 @@ void Window::update_stats()
         max_y_string = std::to_string(y_max.value());
     }
 
+    if (var_x.has_value())
+    {
+        std_dev_x_string = std::to_string(std::sqrt(var_x.value()));
+    }
+
+    if (var_y.has_value())
+    {
+        std_dev_y_string = std::to_string(std::sqrt(var_y.value()));
+    }
+
+    if (data_tables.first.size() == data_tables.second.size())
+    {
+        std::vector<float> multiplied;
+
+        for (int i = 0; i < data_tables.first.size(); i++)
+        {
+            multiplied.push_back(data_tables.first[i] * data_tables.second[i]);
+        }
+
+        sum_multiplied = sum(multiplied);
+
+        if (sum_multiplied.has_value()) sum_multiplied_string = std::to_string(sum_multiplied.value());
+    }
+
     r_item->setText(QString::fromStdString(r_string));
     r2_item->setText(QString::fromStdString(r2_string));
 
     x_mean_item->setText(QString::fromStdString(x_mean_string));
     sum_x_item->setText(QString::fromStdString(sum_x_string));
     sum_x2_item->setText(QString::fromStdString(sum_x2_string));
+    std_dev_x_item->setText(QString::fromStdString(std_dev_x_string));
     min_x_item->setText(QString::fromStdString(min_x_string));
     max_x_item->setText(QString::fromStdString(max_x_string));
 
+    y_mean_item->setText(QString::fromStdString(y_mean_string));
     sum_y_item->setText(QString::fromStdString(sum_y_string));
     sum_y2_item->setText(QString::fromStdString(sum_y2_string));
+    std_dev_y_item->setText(QString::fromStdString(std_dev_y_string));
     min_y_item->setText(QString::fromStdString(min_y_string));
     max_y_item->setText(QString::fromStdString(max_y_string));
+
+    sum_multiplied_item->setText(QString::fromStdString(sum_multiplied_string));
+
+    size_item->setText(QString::fromStdString(size_string));
 }

@@ -71,6 +71,23 @@ std::optional<sums> sum_of_two_squared(std::vector<float> x, std::vector<float> 
     return pair;
 }
 
+std::optional<float> variance(std::vector<float> x)
+{
+    if (x.size() == 0) return std::nullopt;
+
+    float variance = 0;
+    float mean = sum(x).value() / x.size();
+
+    for (int i = 0; i < x.size(); i++)
+    {
+        variance += (x[i] - mean) * (x[i] - mean);
+    }
+
+    variance /= x.size() - 1;
+
+    return variance;
+}
+
 std::optional<float> max(std::vector<float> x)
 {
     if (x.size() == 0) return std::nullopt;

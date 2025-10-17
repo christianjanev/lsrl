@@ -17,6 +17,7 @@ std::optional<float> sum(std::vector<float> x);
 std::optional<sums> sum_of_two(std::vector<float> x, std::vector<float> y);
 std::optional<float> sum_squared(std::vector<float> x);
 std::optional<sums> sum_of_two_squared(std::vector<float> x, std::vector<float> y);
+std::optional<float> variance(std::vector<float> x);
 std::optional<float> max(std::vector<float> x);
 std::optional<float> min(std::vector<float> x);
 

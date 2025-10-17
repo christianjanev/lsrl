@@ -22,6 +22,7 @@
 
 #include <string>
 #include <iostream>
+#include <cmath>
 
 class Window : public QMainWindow
 {
@@ -36,6 +37,7 @@ class Window : public QMainWindow
         QTableWidgetItem* r_item;
         QTableWidgetItem* r2_item;
         QTableWidgetItem* x_mean_item;
+        QTableWidgetItem* y_mean_item;
         QTableWidgetItem* sum_x_item;
         QTableWidgetItem* sum_y_item;
         QTableWidgetItem* sum_x2_item;
@@ -44,11 +46,16 @@ class Window : public QMainWindow
         QTableWidgetItem* max_x_item;
         QTableWidgetItem* min_y_item;
         QTableWidgetItem* max_y_item;
+        QTableWidgetItem* std_dev_x_item;
+        QTableWidgetItem* std_dev_y_item;
+        QTableWidgetItem* sum_multiplied_item;
+        QTableWidgetItem* size_item;
 
         std::string equation_string;
         std::string r_string;
         std::string r2_string;
         std::string x_mean_string;
+        std::string y_mean_string;
         std::string sum_x_string;
         std::string sum_y_string;
         std::string sum_x2_string;
@@ -57,6 +64,9 @@ class Window : public QMainWindow
         std::string max_x_string;
         std::string min_y_string;
         std::string max_y_string;
+        std::string std_dev_x_string;
+        std::string std_dev_y_string;
+        std::string sum_multiplied_string;
 
         std::pair<std::vector<float>, std::vector<float>> data_tables;
         std::pair<std::string, std::string> titles;
@@ -64,6 +74,8 @@ class Window : public QMainWindow
         QScatterSeries* series;
         QScatterSeries* line;
         QChart* graph;
+        QValueAxis* x_axis;
+        QValueAxis* y_axis;
     private slots:
         void button_pressed();
         void table_updated(int row, int col);
