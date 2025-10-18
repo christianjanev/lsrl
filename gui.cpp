@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "qcustomplot.h"
 #include "stats.h"
 #include "data.h"
 
@@ -25,8 +26,10 @@ Window::Window(QWidget* parent) : QMainWindow(parent)
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     table->setRowCount(x.size());
 
-    series = new QScatterSeries;
-    line = new QScatterSeries;
+    // series = new QScatterSeries;
+    // line = new QScatterSeries;
+    x_series = new QVector<double>();
+    y_series = new QVector<double>();
 
     for (int i = 0; i < x.size(); i++)
     {
@@ -40,36 +43,46 @@ Window::Window(QWidget* parent) : QMainWindow(parent)
         item->setText(QString::fromStdString(std::to_string(y[i])));
         table->setItem(i, 1, item);
 
-        series->append(x[i], y[i]);
-        line->append(x[i], y[i]);
+        // series->append(x[i], y[i]);
+        // line->append(x[i], y[i]);
+        x_series->append((double)x[i]);
+        y_series->append((double)y[i]);
     }
 
-    series->setMarkerSize(15);
-    series->setBestFitLineVisible(false);
-    series->setSelectedColor(QColorConstants::Red);
+    plot = ui->graph;
+    x_axis = plot->xAxis;
+    y_axis = plot->yAxis;
+    
+    // graph 0 = scatter only
+    plot->addGraph();
+    line = new QCPItemStraightLine(plot);
+    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    plot->graph(0)->setData(*x_series, *y_series);
+    plot->graph(0)->setLineStyle(QCPGraph::LineStyle::lsNone);
 
-    QPen pen = line->bestFitLinePen();
-    pen.setWidth(pen.width() * 3);
-    line->setBestFitLinePen(pen);
-    line->setPointsVisible(false);
-    line->setBestFitLineVisible(true);
-    line->setBestFitLineColor(QColorConstants::Black);
+    QCPScatterStyle dot_style;
+    dot_style.setShape(QCPScatterStyle::ssDisc);
+    dot_style.setPen(QPen(Qt::blue));
+    dot_style.setBrush(Qt::white);
+    dot_style.setSize(15);
+    plot->graph(0)->setScatterStyle(dot_style);
+    plot->graph(0)->setSelectable(QCP::SelectionType::stSingleData);
 
-    graph = ui->graph->chart();
-    graph->addSeries(series);
-    graph->addSeries(line);
-    graph->createDefaultAxes();
-    QList<QAbstractAxis*> axes = graph->axes(Qt::Horizontal|Qt::Vertical, series);
-    x_axis = (QValueAxis*) axes.first();
-    y_axis = (QValueAxis*) axes.last();
-    x_axis->setMax(max(x).value() * 1.2);
-    y_axis->setMax(max(y).value() * 1.6);
-    x_axis->setMin(min(x).value() - (min(x).value() * 0.2 + 1));
-    y_axis->setMin(min(y).value() - (min(y).value() * 0.2 + 1));
+    std::optional<linear_equation> eq = linreg(x, y);
+    if (eq.has_value())
+    {
+        line->point1->setCoords(0, eq.value().a + eq.value().b * 0);
+        line->point2->setCoords(5, eq.value().a + eq.value().b * 5);\
+    }
 
-    graph->legend()->hide();
-    graph->setDropShadowEnabled(false);
-    graph->setTitle(QString::fromStdString(titles.first + " vs " + titles.second));
+    x_axis->setLabel(table_titles.first());
+    y_axis->setLabel(table_titles.last());
+    x_axis->setRangeUpper(max(data_tables.first).value() * 1.2);
+    y_axis->setRangeUpper(max(data_tables.second).value() * 1.6);
+    x_axis->setRangeLower(min(data_tables.first).value() - ( (min(data_tables.first).value() * 0.2) + 1 ));
+    y_axis->setRangeLower(min(data_tables.second).value() - ( (min(data_tables.second).value() * 0.2) + 1 ));
+
+    plot->replot();
 
     stats = ui->stats;
 
@@ -127,26 +140,32 @@ Window::~Window()
 
 void Window::table_updated(int row, int col)
 {
-    series->replace(data_tables.first[row], data_tables.second[row], std::stof(table->item(row, 0)->text().toStdString()), std::stof(table->item(row, 1)->text().toStdString()));
-    line->replace(data_tables.first[row], data_tables.second[row], std::stof(table->item(row, 0)->text().toStdString()), std::stof(table->item(row, 1)->text().toStdString()));
+    x_series->replace(x_series->indexOf(data_tables.first[row]), std::stof(table->item(row, 0)->text().toStdString()));
+    y_series->replace(y_series->indexOf(data_tables.second[row]), std::stof(table->item(row, 1)->text().toStdString()));
     
     if (col == 0)
         data_tables.first[row] = std::stof(table->item(row, col)->text().toStdString());
     else
         data_tables.second[row] = std::stof(table->item(row, col)->text().toStdString());
 
-    x_axis->setMax(max(data_tables.first).value() * 1.2);
-    y_axis->setMax(max(data_tables.second).value() * 1.6);
-    x_axis->setMin(min(data_tables.first).value() - ( (min(data_tables.first).value() * 0.2) + 1 ));
-    y_axis->setMin(min(data_tables.second).value() - ( (min(data_tables.second).value() * 0.2) + 1 ));
+    plot->graph(0)->setData(*x_series, *y_series);
+
+    std::optional<linear_equation> eq = linreg(data_tables.first, data_tables.second);
+    if (eq.has_value())
+    {
+        line->point1->setCoords(0, eq.value().a + eq.value().b * 0);
+        line->point2->setCoords(5, eq.value().a + eq.value().b * 5);\
+    }
+
+    plot->replot();
 
     update_stats();
 }
 
 void Window::cell_selected(int row, int col, int old_row, int old_col)
 {
-    series->setPointSelected(old_row, false);
-    series->setPointSelected(row, true);
+    // series->setPointSelected(old_row, false);
+    // series->setPointSelected(row, true);
 }
 
 void Window::button_pressed()

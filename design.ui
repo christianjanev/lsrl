@@ -185,7 +185,7 @@
       </layout>
      </item>
      <item row="0" column="2">
-      <widget class="QChartView" name="graph">
+      <widget class="QCustomPlot" name="graph">
        <property name="minimumSize">
         <size>
          <width>1200</width>
@@ -229,9 +229,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QChartView</class>
+   <class>QCustomPlot</class>
    <extends>QGraphicsView</extends>
-   <header>QtCharts.h</header>
+   <header location="global">qcustomplot</header>
   </customwidget>
  </customwidgets>
  <resources/>

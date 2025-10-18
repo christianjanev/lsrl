@@ -15,14 +15,14 @@
 #include <QMenu>
 #include <QSizePolicy>
 #include <QGridLayout>
-#include <QtCharts/QScatterSeries>
-#include <QtCharts/QChart>
 #include <QPen>
-#include <QtCharts/QValueAxis>
+#include <qcustomplot.h>
+#include <QVector>
 
 #include <string>
 #include <iostream>
 #include <cmath>
+#include <limits>
 
 class Window : public QMainWindow
 {
@@ -71,11 +71,18 @@ class Window : public QMainWindow
         std::pair<std::vector<float>, std::vector<float>> data_tables;
         std::pair<std::string, std::string> titles;
 
-        QScatterSeries* series;
-        QScatterSeries* line;
-        QChart* graph;
-        QValueAxis* x_axis;
-        QValueAxis* y_axis;
+        // QScatterSeries* series;
+        // QScatterSeries* line;
+        // QChart* graph;
+        // QValueAxis* x_axis;
+        // QValueAxis* y_axis;
+
+        QCustomPlot* plot;
+        QCPItemStraightLine* line;
+        QCPAxis* x_axis;
+        QCPAxis* y_axis;
+        QVector<double>* x_series;
+        QVector<double>* y_series;
     private slots:
         void button_pressed();
         void table_updated(int row, int col);

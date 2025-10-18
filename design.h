@@ -9,7 +9,6 @@
 #ifndef UI_DESIGN_H
 #define UI_DESIGN_H
 
-#include <QtCharts/QChartView>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtWidgets/QApplication>
@@ -23,6 +22,7 @@
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <qcustomplot.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -38,7 +38,7 @@ public:
     QVBoxLayout *verticalLayout;
     QTableWidget *table;
     QTableWidget *stats;
-    QChartView *graph;
+    QCustomPlot *graph;
     QMenuBar *menubar;
     QMenu *menuFile;
     QStatusBar *statusbar;
@@ -137,7 +137,7 @@ public:
 
         gridLayout->addLayout(verticalLayout, 0, 1, 1, 1);
 
-        graph = new QChartView(gridLayoutWidget);
+        graph = new QCustomPlot(gridLayoutWidget);
         graph->setObjectName("graph");
         graph->setMinimumSize(QSize(1200, 0));
 
